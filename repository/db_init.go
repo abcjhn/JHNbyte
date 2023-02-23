@@ -12,8 +12,8 @@ import (
 // port = 3306
 
 
-var db *gorm.DB
-func Init() (*gorm.DB,error) {
+var Db *gorm.DB
+func Init() error {
 	host := "127.0.0.1"
 	username := "debian-sys-maint"
 	password := "SxnhK2jjmaDMIvwB"
@@ -22,11 +22,11 @@ func Init() (*gorm.DB,error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", username, password, host, port, dbname)
 
 	var err error
-	db,err := gorm.Open(mysql.Open(dsn),&gorm.Config{})
+	Db,err = gorm.Open(mysql.Open(dsn),&gorm.Config{})
 
 	if err != nil{
 		panic("连接数据库失败, error=" + err.Error())
 	}
 
-	return db,err
+	return err
 }
