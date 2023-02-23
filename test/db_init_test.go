@@ -1,4 +1,4 @@
-package repository
+package test
 
 import (
 	"mydousheng/repository"
@@ -15,11 +15,12 @@ func TestInit(t *testing.T) {
 		Name     string
 		Birthday time.Time
 	}
-	db,err := repository.Init();
+	err := repository.Init();
 	if err!=nil{
 		os.Exit(-1)
 	}
+	db := repository.Db
 	db.AutoMigrate(&UserTest{})
-	
+	return
 
 }
