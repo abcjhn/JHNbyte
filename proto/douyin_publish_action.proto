@@ -1,0 +1,13 @@
+syntax = "proto2";
+package douyin_feed.code;
+
+message douyin_publish_action_request{
+    required string token = 1;
+    required bytes data = 2;
+    required string title = 3;
+  }
+
+message douyin_publish_action_response{
+    required int32 status_code = 1;
+    optional string status_msg = 2;
+}
