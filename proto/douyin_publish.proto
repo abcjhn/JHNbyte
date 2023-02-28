@@ -1,15 +1,29 @@
 syntax = "proto2";
-package douyin_feed.extra.first;
+package publish;
+option go_package = "publish";
 
-message douyin_favorite_list_request {
-    required int64 user_id = 1; // 用户id
-    required string token = 2;
+
+message douyin_publish_action_request{
+    required string token =1;
+    required bytes data = 2;
+    required string title = 3;
+  }
+
+message douyin_publish_action_response{
+    required int32 status_code = 1;
+    optional string status_msg = 2;
 }
 
-message douyin_favorite_list_response {
-    required int32 status_code = 1; // 状态码，0-成功，其他值-失败
-    optional string status_msg = 2; // 返回状态描述
-    repeated feed.Video video_list = 3; // 用户点赞视频列表
+
+
+message douyin_publish_list_request{
+    required int64 user_id = 1;
+    required string token = 2;
+}
+message douyin_publish_list_response{
+    required int32 status_code = 1;
+    optional string status_msg = 2;
+    repeated Video video_list = 3;
 }
 
 message Video{
@@ -28,5 +42,5 @@ message Video{
     required string name = 2; //用户名称
     optional int64 follow_count = 3;  //关注总数
     optional int64 follower_count = 4;  //粉丝数量
-    required bool is_follow = 5;  //true-已关注，false-未关注
+    optional bool is_follow = 5;  //true-已关注，false-未关注
  }

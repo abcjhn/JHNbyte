@@ -1,5 +1,7 @@
 syntax = "proto2";
-package douyin_feed.code;
+package feed;
+option go_package = "feed";
+
 
 message douyin_feed_reqest{
     optional int64 latest_time = 1;
@@ -29,5 +31,5 @@ message Video{
     required string name = 2; //用户名称
     optional int64 follow_count = 3;  //关注总数
     optional int64 follower_count = 4;  //粉丝数量
-    required bool is_follow = 5;  //true-已关注，false-未关注
+    optional bool is_follow = 5;  //true-已关注，false-未关注
  }
