@@ -21,14 +21,14 @@ type UserInfo struct{
 	name string
 }
 
-func Feed(lasttime time.Time,num int,myid int)(*[]VideoInfo,error)  {
+func Feed(lasttime time.Time,len int,myid int)(*[]VideoInfo,error)  {
 	VideoPath:= "http://139.196.75.69/mov/"
 	ImgPath :=  "http://139.196.75.69/pic/"
 	videolist,err := repository.Videodao.QueryVideoListByTime(lasttime)
 	if err != nil {
 		return nil, err
 	}
-	var videoinfolist []VideoInfo
+	 videoinfolist :=make([]VideoInfo,len)
 	for _,video := range *videolist{
 		user,err := repository.Userdao.QueryUserById(video.Uid)
 		if err != nil {
@@ -54,6 +54,7 @@ func Feed(lasttime time.Time,num int,myid int)(*[]VideoInfo,error)  {
 		}
 		videoinfolist = append(videoinfolist, *videoinfo)
 	}
+	
 	return &videoinfolist,err
 	
 }
