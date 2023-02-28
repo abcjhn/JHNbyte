@@ -40,6 +40,5 @@ func (userdao *UserDao)QueryUserByName(name string)  (*User,error){
 		return nil,err
 	}
 	return &user,nil
-
-	
 }
+

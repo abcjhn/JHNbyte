@@ -60,9 +60,17 @@ func (videodao *VideoDao)QueryVideoByIdList(id []int)(*[]Video,error)  {
 	if err := Db.Where("id in ?",id).Find(&videolist).Error;err!=nil{
 		return nil,err
 	}
-	return &videolist,nil
-	
+	return &videolist,nil	
 }
+
+func(videodao *VideoDao)QueryVideoListByTime(lasttime time.Time)(*[]Video,error){
+	var videolist []Video
+	if err := Db.Where("Update_time < ?",lasttime).Order("update_time desc").Find(&videolist).Error;err!=nil{
+		return nil,err
+	}
+	return &videolist,nil
+}
+
 func (videodao *VideoDao)IncFavoriteCount(id int) error{
 	if err:=Db.Model(&Video{}).Where("id = ?",id).UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error;err!=nil{
 		return err
