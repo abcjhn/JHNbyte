@@ -6,39 +6,40 @@ import (
 	"time"
 )
 type VideoInfo struct {
-	Id            int                                            //视频唯一标识
-	Author        *UserInfo                                     	//视频作者信息
-	PlayUrl       string                    						//视频播放地址
-	CoverUrl      string                							//视频封面地址
-	FavoriteCount int 				 							//视频的点赞总数
-	CommentCount  int    										//视频的评论总数
-	IsFavorite    bool         										//true-已点赞 false-未点赞
-	Title         string                              				//视频标题
+	Id            int        	`json:"id,omitempty"`                              		//视频唯一标识
+	Author        *UserInfo    	`json:"author,omitempty"`                               //视频作者信息
+	PlayUrl       string        `json:"play_url,omitempty"`            					//视频播放地址
+	CoverUrl      string        `json:"cover_url,omitempty"`        					//视频封面地址
+	FavoriteCount int 			`json:"favorite_count,omitempty"`	 					//视频的点赞总数
+	CommentCount  int    		`json:"comment_count,omitempty"`						//视频的评论总数
+	IsFavorite    bool         	`json:"is_favorite,omitempty"`							//true-已点赞 false-未点赞
+	Title         string        `json:"title,omitempty"`                      			//视频标题
 }
 
 type UserInfo struct{
-	Id int
-	name string
+	Id int 			`json:"id,omitempty"`  
+	name string		`json:"name,omitempty"`
 }
 
-func Feed(lasttime time.Time,len int,myid int)(*[]VideoInfo,error)  {
+func Feed(lasttime time.Time,length int,myid int)([]*VideoInfo,time.Time,error)  {
 	VideoPath:= "http://139.196.75.69/mov/"
 	ImgPath :=  "http://139.196.75.69/pic/"
-	videolist,err := repository.Videodao.QueryVideoListByTime(lasttime)
+	videolist,err := repository.NewVideoDaoInstance().QueryVideoListByTime(lasttime,length)
 	if err != nil {
-		return nil, err
+		return nil,time.Now(),err
 	}
-	 videoinfolist :=make([]VideoInfo,len)
+	var videoinfolist []*VideoInfo
+	var nexttime time.Time
 	for _,video := range *videolist{
-		user,err := repository.Userdao.QueryUserById(video.Uid)
+		user,err := repository.NewUserDaoInstance().QueryUserById(video.Uid)
 		if err != nil {
-			return nil, err
+			return nil,time.Now() ,err
 		}
 		userinfo := &UserInfo{
 			Id: user.Id,
 			name: user.Username,
 		}
-		isfavorite,err := repository.Favdao.QueryByUidandVid(myid,video.Id)
+		isfavorite,err := repository.NewFavoriteDaoIntance().QueryByUidandVid(myid,video.Id)
 		if err != nil {
 			isfavorite = false
 		}
@@ -52,9 +53,9 @@ func Feed(lasttime time.Time,len int,myid int)(*[]VideoInfo,error)  {
 			IsFavorite: isfavorite,
 			Title: video.Tittle,
 		}
-		videoinfolist = append(videoinfolist, *videoinfo)
+		videoinfolist = append(videoinfolist, videoinfo)
+		nexttime = video.UpdatedAt
 	}
-	
-	return &videoinfolist,err
+	return videoinfolist,nexttime,err
 	
 }

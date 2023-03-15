@@ -4,32 +4,32 @@ import "mydousheng/repository"
 
 
 type VideoInfo struct {
-	Id            int                                            //视频唯一标识
-	Author        *UserInfo                                     	//视频作者信息
-	PlayUrl       string                    						//视频播放地址
-	CoverUrl      string                							//视频封面地址
-	FavoriteCount int 				 							//视频的点赞总数
-	CommentCount  int    										//视频的评论总数
-	IsFavorite    bool         										//true-已点赞 false-未点赞
-	Title         string                              				//视频标题
+	Id            int        	`json:"id,omitempty"`                              		//视频唯一标识
+	Author        *UserInfo    	`json:"author,omitempty"`                               //视频作者信息
+	PlayUrl       string        `json:"play_url,omitempty"`            					//视频播放地址
+	CoverUrl      string        `json:"cover_url,omitempty"`        					//视频封面地址
+	FavoriteCount int 			`json:"favorite_count,omitempty"`	 					//视频的点赞总数
+	CommentCount  int    		`json:"comment_count,omitempty"`						//视频的评论总数
+	IsFavorite    bool         	`json:"is_favorite,omitempty"`							//true-已点赞 false-未点赞
+	Title         string        `json:"title,omitempty"`                      			//视频标题
 }
 
 type UserInfo struct{
-	Id int
-	name string
+	Id int 			`json:"id,omitempty"`  
+	name string		`json:"name,omitempty"`
 }
 
 
 func GetPublishList(uid int,myid int) ([]*VideoInfo,error){
 	VideoPath:= "http://139.196.75.69/mov/"
 	ImgPath :=  "http://139.196.75.69/pic/"
-	videolist,err := repository.Videodao.QueryVideoByUid(uid)
+	videolist,err := repository.NewVideoDaoInstance().QueryVideoByUid(uid)
 	if err!=nil{
 		return nil,err
 	}
 	var videoinfolist []*VideoInfo
 	for _,video := range *videolist{
-		user,err := repository.Userdao.QueryUserById(uid)
+		user,err := repository.NewUserDaoInstance().QueryUserById(uid)
 		if err!=nil{
 			return nil,err
 		}
@@ -37,7 +37,7 @@ func GetPublishList(uid int,myid int) ([]*VideoInfo,error){
 			Id: user.Id,
 			name: user.Username,
 		}
-		isfavorite,err :=repository.Favdao.QueryByUidandVid(video.Id,myid)
+		isfavorite,err :=repository.NewFavoriteDaoIntance().QueryByUidandVid(video.Id,myid)
 		if err!=nil{
 			isfavorite=false
 		}

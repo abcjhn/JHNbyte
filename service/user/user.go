@@ -3,13 +3,13 @@ package usersvc
 import "mydousheng/repository"
 
 type UserInfo struct{
-	Id int
-	name string
+	Id int 			`json:"id"`
+	name string		`json:"name"`
 }
 
-func (u *UserInfo)QueryUserInfo(id int) (*UserInfo,error) {
+func QueryUserInfo(id int) (*UserInfo,error) {
 	
-	user,err := repository.Userdao.QueryUserById(id)
+	user,err := repository.NewUserDaoInstance().QueryUserById(id)
 	if err!=nil{
 		return nil,err
 	}

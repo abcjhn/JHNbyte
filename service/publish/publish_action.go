@@ -19,7 +19,7 @@ func PublishVideo(myid int,filename string,covername string )error  {
 		IsDeleted: false,
 
 	}
-	if err:=repository.Videodao.CreateVideo(video);err!=nil{
+	if err:=repository.NewVideoDaoInstance().CreateVideo(video);err!=nil{
 		return err
 	}
 	return nil
