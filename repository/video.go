@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"sync"
 	"time"
 
 	"gorm.io/gorm"
@@ -24,73 +25,85 @@ func (v *Video)TableName()	string  {
 
 type VideoDao struct{}
 
-var Videodao *VideoDao
-func (videodao *VideoDao)CreateVideo(video *Video) error{
-	if err := Db.Create(video).Error; err!=nil{
+
+var videoDao *VideoDao
+var videoOnce sync.Once
+
+
+func NewVideoDaoInstance() *VideoDao {
+	videoOnce.Do(
+		func() {
+			videoDao = &VideoDao{}
+		})
+	return videoDao
+}
+
+func ( *VideoDao)CreateVideo(video *Video) error{
+	if err := GetDb().Create(video).Error; err!=nil{
 		return err
 	}
 	return nil
 
 }
 
-func (videodao *VideoDao)QueryVideoList(num int) (*[]Video, error) {
+func ( *VideoDao)QueryVideoList(num int) (*[]Video, error) {
 	var videolist []Video
-	if err:=Db.Limit(num).Find(&videolist).Error;err!=nil{
+	if err:=GetDb().Limit(num).Find(&videolist).Error;err!=nil{
 		return nil,err
 	}
 	return &videolist,nil
 }
-func (videodao *VideoDao)QueryVideoById(id int) (*Video,error) {
+func ( *VideoDao)QueryVideoById(id int) (*Video,error) {
 	var video Video
-	if err:=Db.Where("id=?",id).Find(&video).Error; err!=nil{
+	if err:=GetDb().Where("id=?",id).Find(&video).Error; err!=nil{
 		return nil,err
 	}
 	return &video,nil
 }
-func (videodao *VideoDao)QueryVideoByUid(uid int) (*[]Video,error){
+func ( *VideoDao)QueryVideoByUid(uid int) (*[]Video,error){
 	var videolist []Video
-	if err := Db.Where("uid=?",uid).Find(&videolist).Error; err!=nil{
+	if err := GetDb().Where("uid=?",uid).Find(&videolist).Error; err!=nil{
 		return nil,err
 	}
 	return &videolist,nil
 }
 
-func (videodao *VideoDao)QueryVideoByIdList(id []int)(*[]Video,error)  {
+func ( *VideoDao)QueryVideoByIdList(id []int)(*[]Video,error)  {
 	var videolist []Video
-	if err := Db.Where("id in ?",id).Find(&videolist).Error;err!=nil{
+	if err := GetDb().Where("id in ?",id).Find(&videolist).Error;err!=nil{
 		return nil,err
 	}
 	return &videolist,nil	
 }
 
-func(videodao *VideoDao)QueryVideoListByTime(lasttime time.Time)(*[]Video,error){
+func( *VideoDao)QueryVideoListByTime(lasttime time.Time, len int)(*[]Video,error){
 	var videolist []Video
-	if err := Db.Where("Update_time < ?",lasttime).Order("update_time desc").Find(&videolist).Error;err!=nil{
+	if err := GetDb().Where("Update_time < ?",lasttime).Order("update_time desc").Limit(len).Find(&videolist).Error;err!=nil{
 		return nil,err
 	}
 	return &videolist,nil
 }
 
-func (videodao *VideoDao)IncFavoriteCount(id int) error{
-	if err:=Db.Model(&Video{}).Where("id = ?",id).UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error;err!=nil{
+func ( *VideoDao)IncFavoriteCount(id int) error{
+	if err:=GetDb().Model(&Video{}).Where("id = ?",id).UpdateColumn("favorite_count", gorm.Expr("favorite_count + ?", 1)).Error;err!=nil{
 		return err
 	}
 	return nil
 }
-func (videodao *VideoDao)DecFavoriteCount(id int) error{
-	if err:=Db.Model(&Video{}).Where("id = ?",id).UpdateColumn("favorite_count", gorm.Expr("favorite_count - ?", 1)).Error;err!=nil{
+func ( *VideoDao)DecFavoriteCount(id int) error{
+	if err:=GetDb().Model(&Video{}).Where("id = ?",id).UpdateColumn("favorite_count", gorm.Expr("favorite_count - ?", 1)).Error;err!=nil{
 		return err
 	}
 	return nil
 }
-func (videodao *VideoDao)IncCommentCount(id int) error{
-	if err:=Db.Model(&Video{}).Where("id = ?",id).UpdateColumn("comment_count", gorm.Expr("comment_count + ?", 1)).Error;err!=nil{
+func ( *VideoDao)IncCommentCount(id int) error{
+	if err:=GetDb().Model(&Video{}).Where("id = ?",id).UpdateColumn("comment_count", gorm.Expr("comment_count + ?", 1)).Error;err!=nil{
 		return err
 	}
 	return nil
 }
-func (videodao *VideoDao)DecCommentCount(id int) error{
-	if err:=Db.Model(&Video{}).Where("id = ?",id).UpdateColumn("comment_count", gorm.Expr("comment_count - ?", 1)).Error;err!=nil{
+func ( *VideoDao)DecCommentCount(id int) error{
+	if err:=GetDb().Model(&Video{}).Where("id = ?",id).UpdateColumn("comment_count", gorm.Expr("comment_count - ?", 1)).Error;err!=nil{
 		return err
 	}
 	return nil

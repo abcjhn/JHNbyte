@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"sync"
 	"time"
 )
 
@@ -17,26 +18,36 @@ func (u User) TableName() string {
 }
 
 type UserDao struct{}
-var Userdao *UserDao
+var userDao *UserDao
+var userOnce sync.Once
 
-func (userdao *UserDao)CreateUser(user *User)  error{
-	if err := Db.Create(user).Error; err!=nil{
+func NewUserDaoInstance() *UserDao{
+	userOnce.Do(
+		func() {
+			userDao = &UserDao{}
+		})
+	return userDao
+}
+
+
+func ( *UserDao)CreateUser(user *User)  error{
+	if err := GetDb().Create(user).Error; err!=nil{
 		return err
 	}
 	return nil
 }
 
-func (userdao *UserDao)QueryUserById(id int) (*User,error){
+func ( *UserDao)QueryUserById(id int) (*User,error){
 	var user User
-	if err := Db.Where("id=?",id).Find(&user).Error; err!=nil{
+	if err := GetDb().Where("id=?",id).Find(&user).Error; err!=nil{
 		return nil,err
 	}
 	return &user,nil
 }
 
-func (userdao *UserDao)QueryUserByName(name string)  (*User,error){
+func ( *UserDao)QueryUserByName(name string)  (*User,error){
 	var user User
-	if err := Db.Where("username=?",name).Find(&user).Error;err!=nil{
+	if err := GetDb().Where("username=?",name).Find(&user).Error;err!=nil{
 		return nil,err
 	}
 	return &user,nil

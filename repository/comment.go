@@ -1,6 +1,9 @@
 package repository
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 type Comment struct{
 	Id			int				`gorm:"column:id"`
 	Uid			int				`gorm:"column:uid"`
@@ -11,18 +14,26 @@ type Comment struct{
 	UpdatedAt 	time.Time		`gorm:"column:updated_time"`
 }
 type CommentDao struct{}
-var Cmtdao *CommentDao
+var cmtDao *CommentDao
+var cmtOnce sync.Once
 
-func(cmtdao *CommentDao) CreateCmt(cmt *Comment)error{
-	if err:=Db.Create(&cmt).Error;err!=nil{
+func NewCommentDaoIntance() *CommentDao{
+	cmtOnce.Do(func() {
+		cmtDao = &CommentDao{}
+	})
+	return cmtDao
+}
+
+func( *CommentDao) CreateCmt(cmt *Comment)error{
+	if err:=GetDb().Create(&cmt).Error;err!=nil{
 		return err
 	}
 	return nil
 }
 
-func(cmtdao *CommentDao) QueryCmtByVid(vid int) (*[]Comment,error) {
+func( *CommentDao) QueryCmtByVid(vid int) (*[]Comment,error) {
 	var  cmtlist []Comment
-	if err:=Db.Where("vid=?",vid).Find(&cmtlist).Error;err!=nil{
+	if err:=GetDb().Where("vid=?",vid).Find(&cmtlist).Error;err!=nil{
 		return nil,err
 	}
 	return &cmtlist,nil
